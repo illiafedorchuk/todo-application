@@ -1,0 +1,21 @@
+{
+  "name": "todo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Illia",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/frontend",
+    "packages/backend"
+  ],
+  "scripts": {
+    "start": "concurrently \"yarn workspace frontend start\""
+  },
+  "devDependencies": {
+    "lerna": "^7.4.2"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
