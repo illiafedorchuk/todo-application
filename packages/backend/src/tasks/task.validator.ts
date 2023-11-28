@@ -33,3 +33,21 @@ export const createValidator: ValidationChain[] = [
     ])
     .withMessage('Status needs to be in text format'),
 ];
+
+export const updateValidator = [
+  body('id')
+    .not()
+    .isEmpty()
+    .withMessage('The task id is mandatory')
+    .trim()
+    .isString()
+    .withMessage('Id needs to be in uuid format'),
+  body('status')
+    .trim()
+    .isIn([
+      Status.todo,
+      Status.inProgress,
+      Status.completed,
+    ])
+    .withMessage('Status needs to be in text format'),
+];
