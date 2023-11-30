@@ -1,12 +1,39 @@
 import React, { FC, ReactElement } from 'react';
-import { Grid, Box } from '@mui/material';
+import {
+  Grid,
+  Box,
+  Alert,
+  LinearProgress,
+} from '@mui/material';
 
 import { format } from 'date-fns';
 import { TaskCounter } from '../taskCounter/taskCounter';
 import { Task } from '../task/task';
-import { TaskSelectField } from '../createTaskForm/_taskSelectField';
+import { useQuery, useMutation } from 'react-query';
+import { sendApiRequest } from '../../helpers/sendApiRequest';
+import { ITaskApi } from './interfaces/ITaskApi';
+import { Status } from '../createTaskForm/enums/Status';
 
 export const TaskArea: FC = (): ReactElement => {
+  const { error, isLoading, data } = useQuery(
+    'tasks',
+    async () => {
+      return await sendApiRequest<ITaskApi[]>(
+        'http://localhost:3300/tasks',
+        'GET',
+      );
+    },
+  );
+
+  // update task mutation
+  const updateTaskMutation = useMutation((data) =>
+    sendApiRequest(
+      'http://localhost:3300/tasks',
+      'PUT',
+      data,
+    ),
+  );
+
   return (
     <Grid item md={8} px={4}>
       <Box mb={8} px={4}>
@@ -27,9 +54,11 @@ export const TaskArea: FC = (): ReactElement => {
           xs={12}
           mb={8}
         >
-          <TaskCounter />
-          <TaskCounter />
-          <TaskCounter />
+          <>
+            <TaskCounter />
+            <TaskCounter />
+            <TaskCounter />
+          </>
         </Grid>
         <Grid
           item
@@ -38,9 +67,42 @@ export const TaskArea: FC = (): ReactElement => {
           xs={10}
           md={8}
         >
-          <Task />
-          <Task />
-          <Task />
+          <>
+            {error && (
+              <Alert severity="error">
+                There was an error fetching your tasks
+              </Alert>
+            )}
+
+            {!error &&
+              Array.isArray(data) &&
+              data.length === 0 && (
+                <Alert severity="warning">
+                  You dont have any tasks created yet.
+                </Alert>
+              )}
+
+            {isLoading ? (
+              <LinearProgress />
+            ) : (
+              Array.isArray(data) &&
+              data.length > 0 &&
+              data.map((each, index) =>
+                each.status === Status.todo ||
+                each.status === Status.inProgress ? (
+                  <Task
+                    key={index + each.priority}
+                    id={each.id}
+                    title={each.title}
+                    date={new Date(each.date)}
+                    description={each.description}
+                    priority={each.priority}
+                    status={each.status}
+                  />
+                ) : null,
+              )
+            )}
+          </>
         </Grid>
       </Grid>
     </Grid>

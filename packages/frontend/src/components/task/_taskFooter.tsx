@@ -7,12 +7,15 @@ import {
 } from '@mui/material';
 import { ITaskFooter } from './interfaces/ITaskFooter';
 import PropTypes from 'prop-types';
+import { Status } from '../createTaskForm/enums/Status';
 
 export const TaskFooter: FC<ITaskFooter> = (
   props,
 ): ReactElement => {
   // Destructure props
   const {
+    id,
+    status,
     onStatusChange = (e) => console.log(e),
     onClick = (e) => console.log(e),
   } = props;
@@ -30,6 +33,7 @@ export const TaskFooter: FC<ITaskFooter> = (
           <Switch
             color="warning"
             onChange={onStatusChange}
+            defaultChecked={status === Status.inProgress}
           />
         }
       />
@@ -49,4 +53,6 @@ export const TaskFooter: FC<ITaskFooter> = (
 TaskFooter.propTypes = {
   onStatusChange: PropTypes.func,
   onClick: PropTypes.func,
+  id: PropTypes.string.isRequired,
+  status: PropTypes.string,
 };
